@@ -95,9 +95,8 @@ class Thread {
          *  @param Priority FreeRTOS priority of this Thread.
          */
 #ifndef CPP_FREERTOS_NO_CPP_STRINGS
-        Thread( const std::string Name,
-                uint16_t StackDepth,
-                UBaseType_t Priority);
+     Thread(const std::string Name, uint16_t StackDepth, UBaseType_t Priority,
+            UBaseType_t CoreAffinity = tskNO_AFFINITY);
 #else
         Thread( const char *Name,
                 uint16_t StackDepth,
@@ -110,63 +109,56 @@ class Thread {
          *  @param StackDepth Number of "words" allocated for the Thread stack.
          *  @param Priority FreeRTOS priority of this Thread.
          */
-        Thread( uint16_t StackDepth,
-                UBaseType_t Priority);
+     Thread(uint16_t StackDepth, UBaseType_t Priority,
+            UBaseType_t CoreAffinity = tskNO_AFFINITY);
 
-        /**
-         *  Starts a thread.
-         *
-         *  This is the API call that actually starts the thread running. 
-         *  It creates a backing FreeRTOS task. By separating object creation 
-         *  from starting the Thread, it solves the pure virtual fuction call 
-         *  failure case. If we attempt to automatically call xTaskCreate 
-         *  from the base class constructor, in certain conditions the task 
-         *  starts to run "before" the derived class is constructed! So we 
-         *  don't do that anymore.
-         *
-         *  This may be called from your ctor once you have completed 
-         *  your objects construction (so as the last step). 
-         *
-         *  This should only be called once ever! 
-         */
-        bool Start();
+     /**
+      *  Starts a thread.
+      *
+      *  This is the API call that actually starts the thread running.
+      *  It creates a backing FreeRTOS task. By separating object creation
+      *  from starting the Thread, it solves the pure virtual fuction call
+      *  failure case. If we attempt to automatically call xTaskCreate
+      *  from the base class constructor, in certain conditions the task
+      *  starts to run "before" the derived class is constructed! So we
+      *  don't do that anymore.
+      *
+      *  This may be called from your ctor once you have completed
+      *  your objects construction (so as the last step).
+      *
+      *  This should only be called once ever!
+      */
+     bool Start();
 
-        /**
-         *  Our destructor. This must exist even if FreeRTOS is
-         *  configured to disallow task deletion.
-         */
-        virtual ~Thread();
+     /**
+      *  Our destructor. This must exist even if FreeRTOS is
+      *  configured to disallow task deletion.
+      */
+     virtual ~Thread();
 
-        /**
-         *  Accessor to get the thread's backing task handle.
-         *  There is no setter, on purpose.
-         *
-         *  @return FreeRTOS task handle.
-         */
-        inline TaskHandle_t GetHandle()
-        {
-            return handle;
-        }
+     /**
+      *  Accessor to get the thread's backing task handle.
+      *  There is no setter, on purpose.
+      *
+      *  @return FreeRTOS task handle.
+      */
+     inline TaskHandle_t GetHandle() { return handle; }
 
-        /**
-         *  Yield the scheduler.
-         */
-        static inline void Yield()
-        {
-            taskYIELD();
-        }
+     /**
+      *  Yield the scheduler.
+      */
+     static inline void Yield() { taskYIELD(); }
 
-        /**
-         *  Start the scheduler.
-         *
-         *  @note You need to use this call. Do NOT directly call 
-         *  vTaskStartScheduler while using this library.
-         */
-        static inline void StartScheduler()
-        {
-            SchedulerActive = true;
-            vTaskStartScheduler();
-        }
+     /**
+      *  Start the scheduler.
+      *
+      *  @note You need to use this call. Do NOT directly call
+      *  vTaskStartScheduler while using this library.
+      */
+     static inline void StartScheduler() {
+       SchedulerActive = true;
+       vTaskStartScheduler();
+     }
 
         /**
          *  End the scheduler.
@@ -399,6 +391,11 @@ class Thread {
          *  A saved / cached copy of what the Thread's priority is.
          */
         UBaseType_t Priority;
+
+        /**
+         *  A saved / cached copy of what the Thread's core affinity is.
+         */
+        UBaseType_t CoreAffinity;
 
         /**
          *  Flag whether or not the Thread was started.

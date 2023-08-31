@@ -56,27 +56,25 @@ MutexStandard Thread::StartGuardLock;
 //
 #ifndef CPP_FREERTOS_NO_CPP_STRINGS
 
-Thread::Thread( const std::string pcName,
-                uint16_t usStackDepth,
-                UBaseType_t uxPriority)
-    :   Name(pcName), 
-        StackDepth(usStackDepth), 
-        Priority(uxPriority),
-        ThreadStarted(false)
-{
+Thread::Thread(const std::string pcName, uint16_t usStackDepth,
+               UBaseType_t uxPriority, UBaseType_t CoreAffinity)
+    : Name(pcName),
+      StackDepth(usStackDepth),
+      Priority(uxPriority),
+      ThreadStarted(false),
+      CoreAffinity(CoreAffinity) {
 #if (INCLUDE_vTaskDelayUntil == 1)
-    delayUntilInitialized = false;
+  delayUntilInitialized = false;
 #endif
 }
 
-
-Thread::Thread( uint16_t usStackDepth,
-                UBaseType_t uxPriority)
-    :   Name("Default"), 
-        StackDepth(usStackDepth), 
-        Priority(uxPriority),
-        ThreadStarted(false)
-{
+Thread::Thread(uint16_t usStackDepth, UBaseType_t uxPriority,
+               UBaseType_t CoreAffinity)
+    : Name("Default"),
+      StackDepth(usStackDepth),
+      Priority(uxPriority),
+      ThreadStarted(false),
+      CoreAffinity(CoreAffinity) {
 #if (INCLUDE_vTaskDelayUntil == 1)
     delayUntilInitialized = false;
 #endif
@@ -154,12 +152,9 @@ bool Thread::Start()
 
 #ifndef CPP_FREERTOS_NO_CPP_STRINGS
 
-    BaseType_t rc = xTaskCreate(TaskFunctionAdapter,
-                                Name.c_str(),
-                                StackDepth,
-                                this,
-                                Priority,
-                                &handle);
+    BaseType_t rc =
+        xTaskCreateAffinitySet(TaskFunctionAdapter, Name.c_str(), StackDepth,
+                               this, Priority, CoreAffinity, &handle);
 #else 
 
     BaseType_t rc = xTaskCreate(TaskFunctionAdapter,
