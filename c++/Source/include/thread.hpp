@@ -128,7 +128,7 @@ class Thread {
       *
       *  This should only be called once ever!
       */
-     bool Start();
+     virtual bool Start();
 
      /**
       *  Our destructor. This must exist even if FreeRTOS is
