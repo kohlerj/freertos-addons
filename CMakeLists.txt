@@ -1,15 +1,19 @@
 
 cmake_minimum_required(VERSION 3.20)
 
-if(NOT TARGET freertos_kernel)
-    message(FATAL_ERROR " freertos_addons requires freertos_kernel. Please include FreeRTOS in your project using FetchContent")
-endif()
+project(freertos_addons)
+
+# if(NOT TARGET freertos_kernel)
+#     message(FATAL_ERROR " freertos_addons requires freertos_kernel. Please include FreeRTOS in your project using FetchContent")
+# endif()
+
+include(GNUInstallDirs)
 
 add_library(freertos_addons INTERFACE)
 
 target_include_directories(freertos_addons INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/c/Source/include>
-    ${CMAKE_CURRENT_SOURCE_DIR}/c++/Source/include>
+    ${CMAKE_CURRENT_SOURCE_DIR}/c/Source/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/c++/Source/include
 )
 
 target_sources(freertos_addons INTERFACE
