@@ -1,6 +1,10 @@
 
 cmake_minimum_required(VERSION 3.20)
 
+if(NOT TARGET freertos_kernel)
+    message(FATAL_ERROR " freertos_addons requires freertos_kernel. Please include FreeRTOS in your project using FetchContent")
+endif()
+
 add_library(freertos_addons INTERFACE)
 
 target_include_directories(freertos_addons INTERFACE
